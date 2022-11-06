@@ -12,6 +12,8 @@ import EXNetworkLayer
 final class HeaderTests: XCTestCase {
     
     class MockHeaders: RequestHeaders {
+        var method: HTTPMethod { .post }
+        
         var headers: HTTPHeader { .jsonContent }
     }
     
