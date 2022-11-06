@@ -7,11 +7,13 @@
 
 import Foundation
 
-protocol API: RequestHeaders, RequestEndpoint {
+public protocol API: RequestHeaders, RequestEndpoint {
     var scheme: HTTPScheme { get }
 }
 
 extension API {
     var port: Int? { nil }
     var uniqueID: String { UUID().uuidString }
+    var cachePolicy: URLRequest.CachePolicy { .useProtocolCachePolicy }
+    var timeInterVal: TimeInterval { 60.0 }
 }

@@ -11,6 +11,7 @@ import Foundation
 public typealias HTTPHeader = [String: HeaderValue]
 
 public protocol RequestHeaders {
+    var method: HTTPMethod { get }
     var headers: HTTPHeader { get }
 }
 
