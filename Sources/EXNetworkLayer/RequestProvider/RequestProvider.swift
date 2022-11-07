@@ -8,6 +8,7 @@
 import Foundation
 
 enum RequestCreatorErrors: Error {
+    // Errors while creating the URL
     case uriCreationFailed
 }
 
@@ -33,12 +34,15 @@ extension RequestProvider {
             throw RequestCreatorErrors.uriCreationFailed
         }
         
-        let request: URLRequest = URLRequest(
+        // Basic request creation
+        var request: URLRequest = URLRequest(
             url: url,
             cachePolicy: api.cachePolicy,
             timeoutInterval: api.timeInterVal
         )
-        
+        // MARK: Header data
+        request.httpMethod = api.method.value
+        request.allHTTPHeaderFields = api.allHeaderData()
         return request
     }
 }

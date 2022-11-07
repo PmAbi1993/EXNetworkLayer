@@ -15,6 +15,17 @@ public protocol RequestHeaders {
     var headers: HTTPHeader { get }
 }
 
+extension RequestHeaders {
+    public func allHeaderData() -> [String: String] {
+        var updatedHeaders: [String: String] = [:]
+        for key in headers.keys {
+            if let dictionaryData = headers[key] {
+                updatedHeaders[key] = dictionaryData.value
+            }
+        }
+        return updatedHeaders
+    }
+}
 extension Dictionary where Key == String, Value == HeaderValue {
     
     public static var none: HTTPHeader { return [:] }
@@ -24,7 +35,21 @@ extension Dictionary where Key == String, Value == HeaderValue {
     }
 }
 
-public protocol HeaderValue {}
-extension String: HeaderValue {}
-extension Int: HeaderValue {}
-extension Double: HeaderValue {}
+public protocol HeaderValue {
+    var value: String { get }
+}
+extension String: HeaderValue {
+    public var value: String {
+        self
+    }
+}
+extension Int: HeaderValue {
+    public var value: String {
+        "\(self)"
+    }
+}
+extension Double: HeaderValue {
+    public var value: String {
+        "\(self)"
+    }
+}
