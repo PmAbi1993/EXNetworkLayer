@@ -18,7 +18,7 @@ public typealias NetworkResponse<U: Codable> = (Result<U, BasicRequestError>) ->
 
 public protocol BasicRequest {
     var api: API { get }
-    var session: URLSession { get }
+    var session: HTTPClient { get set }
     var decoder: JSONDecoder { get }
     var requestProvider: RequestProvider { get }
 }
@@ -34,7 +34,7 @@ extension BasicRequest {
             return
         }
         // MARK: Call the api
-        session.dataTask(with: request) { data, response, error in
+        session.httpDataTask(with: request) { data, response, error in
             
             guard let data = data else {
                 completion(.failure(.noDataPresentInApi(error)))
@@ -62,7 +62,7 @@ extension BasicRequest {
             completion(.failure(.generalError))
             return
         }
-        session.dataTask(with: request) { data, response, error in
+        session.httpDataTask(with: request) { data, response, error in
             
             guard let data = data else {
                 completion(.failure(.noDataPresentInApi(error)))
