@@ -13,8 +13,7 @@ enum RequestCreatorErrors: Error {
 }
 
 public protocol RequestProvider {
-    associatedtype Api: API
-    var api: Api { get }
+    var api: API { get }
     var requestBodyContentCreator: RequestBodyContentCreator { get }
 }
 
