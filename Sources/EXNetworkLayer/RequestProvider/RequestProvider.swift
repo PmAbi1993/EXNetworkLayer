@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum RequestCreatorErrors: Error {
+public enum RequestCreatorErrors: Error {
     // Errors while creating the URL
     case uriCreationFailed
 }
