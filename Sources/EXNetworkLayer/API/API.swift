@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol API: RequestHeaders, RequestEndpoint {
+public protocol API: RequestHeaders, RequestBodyContent, RequestEndpoint {
     var scheme: HTTPScheme { get }
 }
 
