@@ -23,6 +23,7 @@ public protocol BasicRequest {
     var requestProvider: RequestProvider { get }
 }
 
+// MARK: Execute request with Single object as response
 extension BasicRequest {
     public func callApi<U: Decodable>(responseType: U.Type, completion: @escaping NetworkResponse<U>) {
         
@@ -33,6 +34,34 @@ extension BasicRequest {
             return
         }
         // MARK: Call the api
+        session.dataTask(with: request) { data, response, error in
+            
+            guard let data = data else {
+                completion(.failure(.noDataPresentInApi(error)))
+                return
+            }
+            
+            // MARK: Decoding the response
+            guard let responseData = try? decoder.decode(responseType, from: data) else {
+                completion(.failure(.parsingfailed))
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(.success(responseData))
+            }
+        }.resume()
+    }
+}
+
+// MARK: Execute request with Array of objects as response
+extension BasicRequest {
+    public func callApi<U: Decodable>(responseType: [U].Type, completion: @escaping NetworkResponse<[U]>) {
+        
+        guard let request: URLRequest = try?  requestProvider.request() else {
+            completion(.failure(.generalError))
+            return
+        }
         session.dataTask(with: request) { data, response, error in
             
             guard let data = data else {
