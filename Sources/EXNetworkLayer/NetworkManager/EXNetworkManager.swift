@@ -13,9 +13,10 @@ public class EXNetworkManager<T: API>: BasicRequest {
     public var session: HTTPClient
     public var decoder: JSONDecoder
     public var requestProvider: RequestProvider
-    
-    
+    //MARK: Items exclusive for EXNetworkManager
     private var sslPinner: SSLPinningHandler?
+    //MARK: Injectable Dependancies
+    public var requestCacheType: RequestCacheType = .inMemory
     
     public init(api: T,
          session: HTTPClient = URLSession.shared,

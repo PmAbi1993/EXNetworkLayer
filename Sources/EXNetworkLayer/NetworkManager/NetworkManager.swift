@@ -25,7 +25,7 @@ public protocol BasicRequest {
 
 // MARK: Execute request with Single object as response
 extension BasicRequest {
-    public func callApi<U: Decodable>(responseType: U.Type, completion: @escaping NetworkResponse<U>) {
+    public func callApi<U: Codable>(responseType: U.Type, completion: @escaping NetworkResponse<U>) {
         
         // MARK: Get the request
         // TODO: Move all this to `try catch block`
@@ -56,7 +56,7 @@ extension BasicRequest {
 
 // MARK: Execute request with Array of objects as response
 extension BasicRequest {
-    public func callApi<U: Decodable>(responseType: [U].Type, completion: @escaping NetworkResponse<[U]>) {
+    public func callApi<U: Codable>(responseType: [U].Type, completion: @escaping NetworkResponse<[U]>) {
         
         guard let request: URLRequest = try?  requestProvider.request() else {
             completion(.failure(.generalError))
