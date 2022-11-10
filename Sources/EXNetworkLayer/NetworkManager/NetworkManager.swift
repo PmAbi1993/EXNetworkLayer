@@ -10,6 +10,7 @@ import Foundation
 public enum BasicRequestError: Error {
     case requestCreationFailed(RequestCreatorErrors)
     case noDataPresentInApi(_ errorFromApi: Error?)
+    case apiResponseError(error: Error)
     case parsingfailed
     case generalError
 }
@@ -35,18 +36,25 @@ extension BasicRequest {
         }
         // MARK: Call the api
         session.httpDataTask(with: request) { data, response, error in
-            
+            if let error = error {
+                completion(.failure(.apiResponseError(error: error)))
+                return
+            }
             guard let data = data else {
                 completion(.failure(.noDataPresentInApi(error)))
                 return
             }
-            
+            if self.api.shouldLog {
+                self.api.log(self.api,
+                             level: error == nil ? .debug : .error,
+                             data: data,
+                             error: error)
+            }
             // MARK: Decoding the response
             guard let responseData = try? decoder.decode(responseType, from: data) else {
                 completion(.failure(.parsingfailed))
                 return
             }
-            
             DispatchQueue.main.async {
                 completion(.success(responseData))
             }
@@ -62,19 +70,28 @@ extension BasicRequest {
             completion(.failure(.generalError))
             return
         }
+        
         session.httpDataTask(with: request) { data, response, error in
-            
+            if let error = error {
+                completion(.failure(.apiResponseError(error: error)))
+                return
+            }
             guard let data = data else {
                 completion(.failure(.noDataPresentInApi(error)))
                 return
             }
-            
+            // Logging if the data is present
+            if self.api.shouldLog {
+                self.api.log(self.api,
+                             level: error == nil ? .debug : .error,
+                             data: data,
+                             error: error)
+            }
             // MARK: Decoding the response
             guard let responseData = try? decoder.decode(responseType, from: data) else {
                 completion(.failure(.parsingfailed))
                 return
             }
-            
             DispatchQueue.main.async {
                 completion(.success(responseData))
             }
