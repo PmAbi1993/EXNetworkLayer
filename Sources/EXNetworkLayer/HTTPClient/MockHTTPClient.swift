@@ -5,7 +5,10 @@
 //  Created by Abhijith Pm on 08/11/22.
 //
 
-import UIKit
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public enum MockData {
     case data(_ data: Data)

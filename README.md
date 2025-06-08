@@ -154,6 +154,21 @@ networkManager.callApi(responseType: UserData.self) { result in
 ```
 The `EXNetworkManager` accepts a generic API element. This will ensure we can only pass in the proper data and the manager will return a proper result of the codable data we provided in function signature
 
+### Async/Await
+
+Swift Concurrency is also supported from iOS&nbsp;13 and above. The framework exposes
+`async` variants of `callApi` to make network requests without callbacks.
+
+``` swift
+let manager = EXNetworkManager<JSONPlaceHolderApi>(api: .user(id: 1))
+do {
+    let userData: UserData = try await manager.callApi(responseType: UserData.self)
+    print(userData.name)
+} catch {
+    print(error)
+}
+```
+
 ## Adding SSL Pinning 
 
 EXNetworkManager has built in capability to execute API call with SSL Pinning from certificate file.
