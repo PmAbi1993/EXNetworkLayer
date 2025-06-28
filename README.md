@@ -152,6 +152,28 @@ networkManager.callApi(responseType: UserData.self) { result in
     }
 }
 ```
+
+### Async/Await Support
+
+EXNetworkLayer now supports Swift's `async/await` for a more concise and readable asynchronous code. You can use the `async` versions of `callApi` methods directly.
+
+```swift
+@available(iOS 13.0.0, *)
+func fetchUser() async {
+    let networkManager: EXNetworkManager<JSONPlaceHolderApi> = EXNetworkManager(
+        api: .user(id: 1)
+    )
+    do {
+        let userData = try await networkManager.callApi(responseType: UserData.self)
+        print(userData.name)
+        print(userData.username)
+        print(userData.email)
+    } catch {
+        print(error)
+    }
+}
+```
+
 The `EXNetworkManager` accepts a generic API element. This will ensure we can only pass in the proper data and the manager will return a proper result of the codable data we provided in function signature
 
 ## Adding SSL Pinning 

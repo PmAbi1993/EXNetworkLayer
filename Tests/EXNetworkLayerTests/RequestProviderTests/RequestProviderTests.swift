@@ -1,3 +1,4 @@
+
 //
 //  RequestProviderTests.swift
 //  
@@ -6,7 +7,7 @@
 //
 
 import XCTest
-import EXNetworkLayer
+@testable import EXNetworkLayer
 
 class RequestProviderTests: XCTestCase {
     
@@ -63,10 +64,12 @@ class RequestProviderTests: XCTestCase {
 extension RequestProviderTests {
     
     fileprivate class MockRequestProvider<T: API>: RequestProvider {
-        var api: T
+        var api: API
+        var requestBodyContentCreator: RequestBodyContentCreator
         
         init(api: T) {
             self.api = api
+            self.requestBodyContentCreator = EXRequestBodyCreator(api: api)
         }
     }
 }
@@ -74,6 +77,17 @@ extension RequestProviderTests {
 // MARK: Test Api Endpoint creation
 extension RequestProviderTests {
     fileprivate enum TestApi: API {
+        var requestParameters: HTTPRequestBody {
+            .body(params: [:])
+        }
+        
+        var sslContent: SSLContent {
+            .none
+        }
+        
+        var shouldLog: Bool {
+            false
+        }
         
         var scheme: HTTPScheme {
             switch self {
@@ -98,13 +112,17 @@ extension RequestProviderTests {
         
         var baseURL: String { "jsonplaceholder.typicode.com" }
         
-        var endPoint: String {
+        var path: String {
             switch self {
             case .post: return "/posts"
             case .users: return "/users"
             case .comments(let postID): return "/comments?postId=\(postID)"
             case .todo(let todoPage): return "todos/\(todoPage)"
             }
+        }
+        
+        var endPoint: String {
+            path
         }
         
         case post
@@ -114,3 +132,4 @@ extension RequestProviderTests {
 
     }
 }
+

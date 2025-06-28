@@ -98,3 +98,33 @@ extension BasicRequest {
         }.resume()
     }
 }
+
+// MARK: Async-await support
+@available(iOS 13.0.0, *)
+extension BasicRequest {
+    public func callApi<U: Codable>(responseType: U.Type) async throws -> U {
+        return try await withCheckedThrowingContinuation({ continuation in
+            callApi(responseType: responseType) { result in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        })
+    }
+    
+    public func callApi<U: Codable>(responseType: [U].Type) async throws -> [U] {
+        return try await withCheckedThrowingContinuation({ continuation in
+            callApi(responseType: responseType) { result in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        })
+    }
+}

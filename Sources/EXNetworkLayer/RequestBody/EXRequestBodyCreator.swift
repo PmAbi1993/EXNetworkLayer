@@ -5,7 +5,7 @@
 //  Created by Abhijith Pm on 08/11/22.
 //
 
-import UIKit
+import Foundation
 
 public class EXRequestBodyCreator: RequestBodyContentCreator {
     public var api: API

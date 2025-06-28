@@ -1,3 +1,4 @@
+
 //
 //  MockHTTPClient.swift
 //  
@@ -5,7 +6,11 @@
 //  Created by Abhijith Pm on 08/11/22.
 //
 
-import UIKit
+import Foundation
+
+private class DummyURLSessionDataTask: URLSessionDataTask {
+    override func resume() { }
+}
 
 public enum MockData {
     case data(_ data: Data)
@@ -36,7 +41,30 @@ public class MockHTTPClient: HTTPClient {
 
     public func httpDataTask(with request: URLRequest,
                              completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        completionHandler(data, nil, nil)
-        return URLSession.shared.dataTask(with: request)
+        let response = HTTPURLResponse(url: request.url!,
+                                       statusCode: 200,
+                                       httpVersion: nil,
+                                       headerFields: nil)
+        completionHandler(data, response, nil)
+        return DummyURLSessionDataTask()
+    }
+    
+    @available(iOS 13.0.0, *)
+    public func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        return try await withCheckedThrowingContinuation({ continuation in
+            let task = httpDataTask(with: request) { data, response, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let data = data, let response = response else {
+                    continuation.resume(throwing: URLError(.badServerResponse))
+                    return
+                }
+                continuation.resume(returning: (data, response))
+            }
+            task.resume()
+        })
     }
 }
+

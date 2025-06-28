@@ -5,7 +5,7 @@
 //  Created by Abhijith Pm on 08/11/22.
 //
 
-import UIKit
+import Foundation
 
 public class EXNetworkManager<T: API>: BasicRequest {
     
@@ -35,7 +35,7 @@ public class EXNetworkManager<T: API>: BasicRequest {
 extension EXNetworkManager {
     func prepareSessionForSSL() -> URLSession? {
         switch self.api.sslContent {
-        case .none: return .shared
+        case .none: return nil
         case .file(bundle: let bundle, name: let fileName, extenstion: let extenstion):
             sslPinner = SSLPinningHandler(bundle: bundle, fileName: fileName, fileExtension: extenstion)
             return sslPinner?.urlSession ?? URLSession(configuration: .default)
