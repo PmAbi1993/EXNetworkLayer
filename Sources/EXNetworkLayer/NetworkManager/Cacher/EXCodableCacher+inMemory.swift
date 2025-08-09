@@ -5,7 +5,7 @@
 //  Created by Abhijith Pm on 09/11/22.
 //
 
-import UIKit
+import Foundation
 
 // MARK: Functions to save and retreive data into memory
 extension EXCodableCacher {

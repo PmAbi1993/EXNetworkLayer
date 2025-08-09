@@ -24,7 +24,7 @@ extension EXNetworkManager {
         
     }
     
-    public func callApi<U: Decodable>(responseType: [U].Type,
+    public func callApi<U: Codable>(responseType: [U].Type,
                                       cacheKey: String,
                                       cachedResponse: U,
                                       result completion: @escaping NetworkResponse<[U]>) {
@@ -33,6 +33,7 @@ extension EXNetworkManager {
                 let cacher = EXCodableCacher(cacheType: self.requestCacheType)
                 cacher.saveResponseToCache(key: cacheKey, data: encodedData)
             }
+            completion(result)
         }
     }
 }

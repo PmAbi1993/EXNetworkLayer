@@ -5,11 +5,11 @@
 //  Created by Abhijith Pm on 08/11/22.
 //
 
-import UIKit
+import Foundation
 
 public enum MockData {
     case data(_ data: Data)
-    case jsonFile(bundle: Bundle, name: String, extension: String = "json")
+    case jsonFile(bundle: Bundle, name: String, `extension`: String = "json")
     
     var data: Data? {
         switch self {
