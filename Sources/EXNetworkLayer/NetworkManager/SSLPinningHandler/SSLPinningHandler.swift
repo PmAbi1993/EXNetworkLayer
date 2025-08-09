@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Security
 
 class SSLPinningHandler: NSObject, URLSessionDelegate {
 
@@ -55,7 +56,7 @@ class SSLPinningHandler: NSObject, URLSessionDelegate {
         let isServerTrusted = SecTrustEvaluateWithError(serverTrust, nil)
         
         // Local Certificate Data
-        guard let filePath = Bundle.main.path(forResource: "JSONPlaceholder", ofType: "cer"),
+        guard let filePath = bundle.path(forResource: fileName, ofType: fileExtension),
               let localCertificate = NSData(contentsOfFile: filePath) else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return

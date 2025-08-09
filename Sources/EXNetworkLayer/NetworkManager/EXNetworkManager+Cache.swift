@@ -12,27 +12,21 @@ extension EXNetworkManager {
     
     public func callApi<U: Codable>(responseType: U.Type,
                                     cacheKey: String,
-                                    cachedResponse: U,
                                     result completion: @escaping NetworkResponse<U>) {
+        let cacher = EXCodableCacher(cacheType: self.requestCacheType)
+        if let cached: U = cacher.getResponseFromCache(key: cacheKey, type: responseType) {
+            DispatchQueue.main.async {
+                completion(.success(cached))
+            }
+            return
+        }
+        // Cache miss: perform network call and store result
         self.callApi(responseType: responseType) { result in
             if case let .success(encodedData) = result {
                 let cacher = EXCodableCacher(cacheType: self.requestCacheType)
                 cacher.saveResponseToCache(key: cacheKey, data: encodedData)
             }
             completion(result)
-        }
-        
-    }
-    
-    public func callApi<U: Decodable>(responseType: [U].Type,
-                                      cacheKey: String,
-                                      cachedResponse: U,
-                                      result completion: @escaping NetworkResponse<[U]>) {
-        self.callApi(responseType: responseType) { result in
-            if case let .success(encodedData) = result {
-                let cacher = EXCodableCacher(cacheType: self.requestCacheType)
-                cacher.saveResponseToCache(key: cacheKey, data: encodedData)
-            }
         }
     }
 }
