@@ -53,9 +53,7 @@ public extension EXNetworkManager {
                     buffer.reserveCapacity(8 * 1024)
 
                     for try await byte in bytes {
-                        if Task.isCancelled {
-                            throw CancellationError()
-                        }
+                        try Task.checkCancellation()
                         buffer.append(byte)
                         // Emit in ~8KB chunks to reduce overhead
                         if buffer.count >= 8 * 1024 {
