@@ -1,7 +1,4 @@
-# EXNetworkLayer
-
-[![CI](https://github.com/PmAbi1993/EXNetworkLayer/actions/workflows/ci.yml/badge.svg)](https://github.com/PmAbi1993/EXNetworkLayer/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/PmAbi1993/EXNetworkLayer/branch/main/graph/badge.svg)](https://codecov.io/gh/PmAbi1993/EXNetworkLayer)
+# EXNetworkLayer [![CI](https://github.com/PmAbi1993/EXNetworkLayer/actions/workflows/ci.yml/badge.svg)](https://github.com/PmAbi1993/EXNetworkLayer/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/PmAbi1993/EXNetworkLayer/branch/main/graph/badge.svg)](https://codecov.io/gh/PmAbi1993/EXNetworkLayer)
 
 EXNetworkLayer is a library made to simplify network calls made by our app in an easy to debug manner.
 
