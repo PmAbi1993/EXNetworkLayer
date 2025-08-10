@@ -49,6 +49,11 @@ jobs:
       - name: Swift version
         run: swift --version
 
+      - name: Add llvm tools to PATH
+        run: |
+          echo "$(dirname $(xcrun --find llvm-cov))" >> $GITHUB_PATH
+          echo "$(dirname $(xcrun --find llvm-profdata))" >> $GITHUB_PATH
+
       - name: Build (warnings as errors)
         run: swift build -v -Xswiftc -warnings-as-errors
 
