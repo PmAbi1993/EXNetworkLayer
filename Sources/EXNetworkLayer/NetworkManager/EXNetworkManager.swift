@@ -35,7 +35,9 @@ public class EXNetworkManager<T: API>: BasicRequest {
 extension EXNetworkManager {
     func prepareSessionForSSL() -> URLSession? {
         switch self.api.sslContent {
-        case .none: return .shared
+        case .none:
+            // Do not override the injected session when SSL pinning is not configured.
+            return nil
         case .file(bundle: let bundle, name: let fileName, extenstion: let extenstion):
             sslPinner = SSLPinningHandler(bundle: bundle, fileName: fileName, fileExtension: extenstion)
             return sslPinner?.urlSession ?? URLSession(configuration: .default)
