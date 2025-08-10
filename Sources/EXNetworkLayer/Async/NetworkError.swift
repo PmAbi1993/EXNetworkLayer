@@ -1,6 +1,6 @@
 import Foundation
 
-public enum NetworkError: Error, Equatable {
+public enum NetworkError: Error {
     case transport(URLError)
     case invalidResponse(statusCode: Int)
     case decoding(Error)
@@ -22,3 +22,24 @@ extension NetworkError: LocalizedError {
     }
 }
 
+extension NetworkError: Equatable {
+    public static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
+        switch (lhs, rhs) {
+        case let (.transport(l), .transport(r)):
+            return l == r
+        case let (.invalidResponse(l), .invalidResponse(r)):
+            return l == r
+        case (.decoding, .decoding):
+            // Cannot compare Error types directly. For tests, checking the case is sufficient.
+            return true
+        case (.noData, .noData):
+            return true
+        case (.timeout, .timeout):
+            return true
+        case (.cancelled, .cancelled):
+            return true
+        default:
+            return false
+        }
+    }
+}

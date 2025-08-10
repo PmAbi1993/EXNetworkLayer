@@ -4,18 +4,8 @@ public extension EXNetworkManager {
     /// Perform the configured request and decode into `T` using `JSONDecoder`.
     /// - Throws: `CancellationError` when the task is cancelled, or `NetworkError` for transport/decoding issues.
     func request<T: Decodable>(_ type: T.Type) async throws -> T {
-        if Task.isCancelled { throw CancellationError() }
-
-        let urlRequest = try requestProvider.request()
         do {
-            let (data, response) = try await underlyingSession().data(for: urlRequest)
-
-            if Task.isCancelled { throw CancellationError() }
-
-            if api.shouldLog { api.log(api, level: .debug, data: data, error: nil) }
-
-            try validate(response: response)
-
+            let (data, _) = try await performRequest()
             do {
                 return try decoder.decode(T.self, from: data)
             } catch {
@@ -28,20 +18,24 @@ public extension EXNetworkManager {
 
     /// Perform the configured request and return raw `Data`.
     func request() async throws -> Data {
-        if Task.isCancelled { throw CancellationError() }
-
-        let urlRequest = try requestProvider.request()
         do {
-            let (data, response) = try await underlyingSession().data(for: urlRequest)
-
-            if Task.isCancelled { throw CancellationError() }
-
-            if api.shouldLog { api.log(api, level: .debug, data: data, error: nil) }
-            try validate(response: response)
+            let (data, _) = try await performRequest()
             return data
         } catch {
             throw map(error)
         }
+    }
+    private func performRequest() async throws -> (Data, URLResponse) {
+        try Task.checkCancellation()
+
+        let urlRequest = try requestProvider.request()
+        let (data, response) = try await underlyingSession().data(for: urlRequest)
+
+        try Task.checkCancellation()
+
+        if api.shouldLog { api.log(api, level: .debug, data: data, error: nil) }
+        try validate(response: response)
+        return (data, response)
     }
 
     /// Streaming download using URLSession native async bytes API.
