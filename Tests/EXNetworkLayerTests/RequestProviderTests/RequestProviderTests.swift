@@ -10,12 +10,12 @@ import EXNetworkLayer
 
 class RequestProviderTests: XCTestCase {
     
-    private var userApi: MockRequestProvider<TestApi> = .init(api: .users)
-    private var postApi: MockRequestProvider<TestApi> = .init(api: .post)
-    private var commentsApi: MockRequestProvider<TestApi> = .init(api: .comments(2))
-    private var todoApi: MockRequestProvider<TestApi> = .init(api: .todo(2))
+    private var userApi: EXRequestProvider<TestApi> = .init(api: .users)
+    private var postApi: EXRequestProvider<TestApi> = .init(api: .post)
+    private var commentsApi: EXRequestProvider<TestApi> = .init(api: .comments(2))
+    private var todoApi: EXRequestProvider<TestApi> = .init(api: .todo(2))
 
-    private var allRequestProviders: [MockRequestProvider<TestApi>] {
+    private var allRequestProviders: [EXRequestProvider<TestApi>] {
         [ postApi,
           userApi,
           commentsApi,
@@ -50,24 +50,12 @@ class RequestProviderTests: XCTestCase {
         )
     }
     
-    private func url(for provider: MockRequestProvider<TestApi>) -> String  {
+    private func url(for provider: EXRequestProvider<TestApi>) -> String  {
         guard let url = try? provider.request().url else {
             XCTFail("Failed converting request data to url")
             return ""
         }
         return url.absoluteString
-    }
-}
-
-// MARK: Mock Provider Data
-extension RequestProviderTests {
-    
-    fileprivate class MockRequestProvider<T: API>: RequestProvider {
-        var api: T
-        
-        init(api: T) {
-            self.api = api
-        }
     }
 }
 
@@ -95,6 +83,12 @@ extension RequestProviderTests {
             default: return ["Authorization": "Bearer abcdefghi"]
             }
         }
+        
+        var requestParameters: HTTPRequestBody { .none }
+        
+        var sslContent: SSLContent { .none }
+        
+        var shouldLog: Bool { false }
         
         var baseURL: String { "jsonplaceholder.typicode.com" }
         

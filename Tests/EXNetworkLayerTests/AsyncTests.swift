@@ -64,6 +64,7 @@ private struct SampleAPI: API {
     var baseURL: String { "example.com" }
     var endPoint: String { "/test" }
     var shouldLog: Bool { false }
+    var sslContent: SSLContent { .none }
 }
 
 final class AsyncTests: XCTestCase {
@@ -208,7 +209,7 @@ final class AsyncTests: XCTestCase {
         do {
             _ = try await concurrently([
                 { try await Task.sleep(nanoseconds: 200_000_000); return 0 },
-                { throw DummyError.boom },
+                { () async throws -> Int in throw DummyError.boom },
                 {
                     // should be cancelled before finishing
                     try await Task.sleep(nanoseconds: 300_000_000)

@@ -3,11 +3,11 @@ import Foundation
 public extension EXNetworkManager {
     /// Perform the configured request and decode into `T` using `JSONDecoder`.
     /// - Throws: `CancellationError` when the task is cancelled, or `NetworkError` for transport/decoding issues.
-    func request<T: Decodable>(_ type: T.Type) async throws -> T {
+    func request<R: Decodable>(_ type: R.Type) async throws -> R {
         do {
             let (data, _) = try await performRequest()
             do {
-                return try decoder.decode(T.self, from: data)
+                return try decoder.decode(R.self, from: data)
             } catch {
                 throw NetworkError.decoding(error)
             }
