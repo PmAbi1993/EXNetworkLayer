@@ -154,6 +154,41 @@ networkManager.callApi(responseType: UserData.self) { result in
 ```
 The `EXNetworkManager` accepts a generic API element. This will ensure we can only pass in the proper data and the manager will return a proper result of the codable data we provided in function signature
 
+## Async/Await APIs (iOS 15+/macOS 12+)
+
+EXNetworkLayer now offers native Swift concurrency for clean, composable usage. The legacy completion APIs remain available.
+
+```swift
+// JSON decode into a model
+let client = EXNetworkManager<JSONPlaceHolderAPI>(api: .user(id: 1))
+let user: User = try await client.request(User.self)
+
+// Raw Data
+let data: Data = try await client.request()
+
+// Cancellation
+let task = Task {
+    try await client.request(User.self)
+}
+task.cancel()
+do { _ = try await task.value } catch is CancellationError { /* expected */ }
+
+// Parallel fan-out
+let users: [User] = try await concurrently([
+    { try await EXNetworkManager(api: JSONPlaceHolderAPI.user(id: 1)).request(User.self) },
+    { try await EXNetworkManager(api: JSONPlaceHolderAPI.user(id: 2)).request(User.self) },
+    { try await EXNetworkManager(api: JSONPlaceHolderAPI.user(id: 3)).request(User.self) }
+])
+
+// Streaming download
+let streamClient = EXNetworkManager<JSONPlaceHolderAPI>(api: .users)
+for try await chunk in streamClient.download() {
+    // process Data chunk
+}
+```
+
+Error surfaces are typed via `NetworkError` and cooperative cancellation is honored with `CancellationError`.
+
 ## Adding SSL Pinning 
 
 EXNetworkManager has built in capability to execute API call with SSL Pinning from certificate file.
