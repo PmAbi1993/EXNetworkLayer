@@ -93,7 +93,7 @@ jobs:
           - generic/platform=watchOS Simulator
     env:
       XCODE_VERSION: '15.4'
-      SCHEME: 'EXNetworkLayer-Package'
+      SCHEME: 'EXNetworkLayer'
     steps:
       - uses: actions/checkout@v4
 
