@@ -39,7 +39,18 @@ class SSLPinningHandler: NSObject, URLSessionDelegate {
             return
         }
         
-        guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
+        // Obtain the leaf certificate (index 0) using modern API when available
+        let certificate: SecCertificate?
+        if #available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
+            if let chain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] {
+                certificate = chain.first
+            } else {
+                certificate = nil
+            }
+        } else {
+            certificate = SecTrustGetCertificateAtIndex(serverTrust, 0)
+        }
+        guard let certificate else {
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
@@ -51,6 +62,8 @@ class SSLPinningHandler: NSObject, URLSessionDelegate {
         policy.add(
             SecPolicyCreateSSL(true, challenge.protectionSpace.host as CFString)
         )
+        // Apply policy to the trust object to ensure hostname validation
+        SecTrustSetPolicies(serverTrust, policy)
         
         // Evaluate server certificate
         let isServerTrusted = SecTrustEvaluateWithError(serverTrust, nil)

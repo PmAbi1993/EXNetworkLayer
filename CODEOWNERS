@@ -1,0 +1,6 @@
+# Default code owners for the repository
+*       @PmAbi1993
+
+# EXNetworkLayer sources
+Sources/EXNetworkLayer/**  @PmAbi1993
+
