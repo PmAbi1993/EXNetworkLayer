@@ -1,0 +1,106 @@
+name: EXNetworkLayer CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-macos:
+    name: Build & Test (macOS)
+    runs-on: macos-14
+    env:
+      XCODE_VERSION: '15.4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build (warnings as errors)
+        run: swift build -v -Xswiftc -warnings-as-errors
+
+      - name: Test (with coverage)
+        run: swift test -v --parallel --enable-code-coverage
+
+      - name: Generate LCOV
+        uses: maxep/spm-lcov-action@0.3.1
+        with:
+          output-file: ./coverage/lcov.info
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: ./coverage/lcov.info
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          disable_search: true
+          flags: unittests
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
+
+  build-apple-platforms:
+    name: Compile (iOS/tvOS/watchOS)
+    needs: test-macos
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        dest:
+          - generic/platform=iOS Simulator
+          - generic/platform=tvOS Simulator
+          - generic/platform=watchOS Simulator
+    env:
+      XCODE_VERSION: '15.4'
+      SCHEME: 'EXNetworkLayer-Package'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: xcodebuild compile (${{ matrix.dest }}) with warnings as errors
+        run: |
+          set -o pipefail
+          xcodebuild -scheme "$SCHEME" \
+            -destination "${{ matrix.dest }}" \
+            OTHER_SWIFT_FLAGS="-warnings-as-errors" \
+            -configuration Debug build
